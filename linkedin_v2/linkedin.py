@@ -35,7 +35,7 @@ ENDPOINTS = enum('LinkedInURL',
                  PEOPLE='https://api.linkedin.com/v2/people',
                  PEOPLE_SEARCH='https://api.linkedin.com/v2/people-search',
                  GROUPS='https://api.linkedin.com/v2/groups',
-                 POSTS='https://api.linkedin.com/v2/posts',
+                 POSTS='https://api.linkedin.com/v2/ugcPosts',
                  COMPANIES='https://api.linkedin.com/v2/companies',
                  COMPANY_SEARCH='https://api.linkedin.com/v2/company-search',
                  JOBS='https://api.linkedin.com/v2/jobs',
@@ -194,3 +194,69 @@ class LinkedInApplication(object):
         json_response = response.json()
         json_response.update({'numConnections': connections})
         return json_response
+
+    def submit_share(self, comment=None, title=None, description=None,
+                     submitted_url=None, submitted_image_url=None,
+                     urn=None, visibility_code='anyone'):
+
+        access_token = self.authentication.token.access_token
+        author = f"urn:li:person:{urn}"        
+        headers = {'X-Restli-Protocol-Version': '2.0.0',
+           'Content-Type': 'application/json',
+           'Authorization': f'Bearer {access_token}'}
+
+        api_url = '%s' % ENDPOINTS.POSTS
+
+        if comment == None:
+            comment = ''
+ 
+        try:
+            if submitted_url: 
+                post_data = {
+                    "author": author,
+                    "lifecycleState": "PUBLISHED",
+                    "specificContent": {
+                        "com.linkedin.ugc.ShareContent": {
+                            "shareCommentary": {
+                                "text": comment
+                            },
+                            "shareMediaCategory": "ARTICLE",
+                            "media": [
+                                { "status": "READY",
+                                    "originalUrl": submitted_url,
+                                    "title": {
+                                        "text": title
+                                    }
+                               }
+                            ]
+                        },
+                    },
+                    "visibility": {
+                        "com.linkedin.ugc.MemberNetworkVisibility": "CONNECTIONS"
+                    },
+                }
+            else: 
+                post_data = {
+                     "author": author,
+                     "lifecycleState": "PUBLISHED",
+                     "specificContent": {
+                         "com.linkedin.ugc.ShareContent": {
+                             "shareCommentary": {
+                                 "text": title
+                             },
+                             "shareMediaCategory": "NONE"
+                         },
+                     },
+                     "visibility": {
+                         "com.linkedin.ugc.MemberNetworkVisibility": "CONNECTIONS"
+                     },
+                }
+
+            res = requests.post(api_url, headers=headers, json=post_data)
+            if res.status_code == 201: 
+                return("Success ") 
+            else: 
+                return(res.content)
+        except:        
+            return('LinkedIn: {0} {1} {2}'.format(title, submitted_url, sys.exc_info()))
+
