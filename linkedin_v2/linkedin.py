@@ -36,6 +36,7 @@ ENDPOINTS = enum('LinkedInURL',
                  PEOPLE_SEARCH='https://api.linkedin.com/v2/people-search',
                  GROUPS='https://api.linkedin.com/v2/groups',
                  POSTS='https://api.linkedin.com/v2/ugcPosts',
+                 SHARES='https://api.linkedin.com/v2/shares',
                  COMPANIES='https://api.linkedin.com/v2/companies',
                  COMPANY_SEARCH='https://api.linkedin.com/v2/company-search',
                  JOBS='https://api.linkedin.com/v2/jobs',
@@ -254,9 +255,46 @@ class LinkedInApplication(object):
 
             res = requests.post(api_url, headers=headers, json=post_data)
             if res.status_code == 201: 
-                return("Success ") 
+                return(res) 
             else: 
                 return(res.content)
         except:        
             return('LinkedIn: {0} {1} {2}'.format(title, submitted_url, sys.exc_info()))
+
+    def delete_post(self, idPost=None, urn=None):
+        access_token = self.authentication.token.access_token
+        author = f"urn:li:person:{urn}"        
+        post = f'urn:li:ugcPost:{idPost}'
+        headers = {'X-Restli-Protocol-Version': '2.0.0',
+           'Content-Type': 'application/json',
+           'Authorization': f'Bearer {access_token}'}
+
+        import urllib.parse
+        url = '%s/%s' % (ENDPOINTS.POSTS, urllib.parse.quote(post))
+        print(url)
+
+        response = self.make_request('GET', url, headers=headers)
+        print(response)
+        raise_for_error(response)
+        return response.json()
+
+
+    def get_posts(self, urn=None):
+        access_token = self.authentication.token.access_token
+        author = f"urn:li:person:{urn}"        
+        headers = {'X-Restli-Protocol-Version': '2.0.0',
+           'Content-Type': 'application/json',
+           'Authorization': f'Bearer {access_token}'}
+
+        url = '%s' % ENDPOINTS.POSTS
+        #url = '%s?q=owners&owners={%s}&sortBy=LAST_MODIFIED&sharesPerOwner=100' % (ENDPOINTS.POSTS, urn) 
+        params = {'q':'author', 
+                'authors':f'List({author})',
+                'sortBy':'LAST_MODIFIED'
+                }
+        response = self.make_request('GET', url, data=params, headers=headers)
+        print(response)
+        raise_for_error(response)
+        return response.json()
+
 
