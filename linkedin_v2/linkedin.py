@@ -233,7 +233,7 @@ class LinkedInApplication(object):
                         },
                     },
                     "visibility": {
-                        "com.linkedin.ugc.MemberNetworkVisibility": "CONNECTIONS"
+                        "com.linkedin.ugc.MemberNetworkVisibility": visibility_code
                     },
                 }
             else: 
@@ -249,7 +249,7 @@ class LinkedInApplication(object):
                          },
                      },
                      "visibility": {
-                         "com.linkedin.ugc.MemberNetworkVisibility": "CONNECTIONS"
+                         "com.linkedin.ugc.MemberNetworkVisibility": visibility_code
                      },
                 }
 
