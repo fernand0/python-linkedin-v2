@@ -1,6 +1,7 @@
 # Archived
  
-This repository is obsolete because of the change in LinkedIn APIs and the publication of an official SDK. [https://github.com/linkedin-developers/linkedin-api-python-client](https://github.com/linkedin-developers/linkedin-api-python-client)
+This repository is obsolete because of the change in LinkedIn APIs and the publication of a [![LinkedIn official SDK](https://github.com/linkedin-developers/linkedin-api-python-client)](https://github.com/linkedin-developers/linkedin-api-python-client)
+
 # Python LinkedIn V2
 
 Python interface to the LinkedIn API V2
